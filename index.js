@@ -92,9 +92,11 @@ httpServer.listen(port, '0.0.0.0', (err) => {
 });
 
 
+let requestHandled = false;
 
 // Endpoint to get messages for a specific chat
 httpServer.on('request', async (req, res) => {
+     requestHandled = false;
   const url = new URL(req.url, `http://${req.headers.host}`);
     if (url.pathname.startsWith('/messages/')) {
         if(req.method === 'GET'){
@@ -104,6 +106,7 @@ httpServer.on('request', async (req, res) => {
                             if(cachedMessages){
                                 res.writeHead(200, { 'Content-Type': 'application/json' });
                                 res.end(JSON.stringify(cachedMessages));
+                                requestHandled = true;
                                 return;
                             }
 
@@ -116,21 +119,33 @@ httpServer.on('request', async (req, res) => {
                                   cache.set(chatId, response.documents);
                                  res.writeHead(200, { 'Content-Type': 'application/json' });
                                 res.end(JSON.stringify(response.documents));
+                                requestHandled = true;
+                                 return;
                     }catch(error){
                          console.error("Error getting messages:", error);
                              res.writeHead(500, { 'Content-Type': 'text/plain' });
                              res.end('Internal Server Error');
+                                requestHandled = true;
+                                  return;
                     }
         } else {
-           res.writeHead(405, { 'Content-Type': 'text/plain' });
-           res.end('Method Not Allowed');
+            res.writeHead(405, { 'Content-Type': 'text/plain' });
+            res.end('Method Not Allowed');
+            requestHandled = true;
+            return;
       }
     }
     
-    
-    if (url.pathname === '/') {
-        res.writeHead(200, { 'Content-Type': 'text/plain' });
-        res.end("Hello World");
-  }
+        if (url.pathname === '/') {
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end("Hello World");
+            requestHandled = true;
+             return;
+    }
+         if (!requestHandled) {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('Not Found');
+             return;
+        }
 
 });
