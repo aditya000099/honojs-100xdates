@@ -1,4 +1,4 @@
-const { Client, Databases } = require("node-appwrite");
+const { Client, Databases, Query } = require("node-appwrite");
 const http = require("http");
 const { Server } = require("socket.io");
 const NodeCache = require("node-cache");
