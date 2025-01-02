@@ -104,6 +104,6 @@ io.on('connection', (socket) => {
 });
 
 // Start server
-httpServer.listen(3001, () => {
-  console.log('Server is running on http://localhost:3001');
+httpServer.listen(process.env.PORT, () => {
+  console.log('Server is running on port', process.env.PORT);
 });
